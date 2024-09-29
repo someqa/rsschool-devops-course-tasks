@@ -1,7 +1,3 @@
-resource "aws_s3_bucket" "tf-example" {
-  bucket = var.tf_created_s3_bucket
-}
-
 resource "aws_iam_openid_connect_provider" "github_actions_oidc_provider" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -25,17 +21,22 @@ resource "aws_iam_role" "GithubActionsRole" {
           Federated = "arn:aws:iam::${var.aws_account_id}:oidc-provider/token.actions.githubusercontent.com"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
+        
         Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          },
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:${var.repository}:ref:*"
-            ]
+            ],
           }
         }
       }
     ]
   })
 }
+
 
 
 resource "aws_iam_role_policy_attachment" "attach_github_actions_policy" {
