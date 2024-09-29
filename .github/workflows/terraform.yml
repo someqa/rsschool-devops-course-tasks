@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - main
-      # for testing purposes, to remove when gh-actions tested
-      - task1/terraform-setup
 
 env:
   TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
