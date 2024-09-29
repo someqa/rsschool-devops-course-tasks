@@ -2,6 +2,18 @@ resource "aws_s3_bucket" "tf-example" {
   bucket = var.tf_created_s3_bucket
 }
 
+resource "aws_iam_openid_connect_provider" "github_actions_oidc_provider" {
+  url = "https://token.actions.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+
+  thumbprint_list = [
+    var.thumbnail
+  ]
+}
+
 resource "aws_iam_role" "GithubActionsRole" {
   name               = "GithubActionsRole"
   assume_role_policy = jsonencode({
@@ -15,7 +27,7 @@ resource "aws_iam_role" "GithubActionsRole" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/${var.repo_name}:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = "repo:${var.repository}:ref:refs/heads/main"
           }
         }
       }

@@ -10,18 +10,18 @@ variable "aws_region" {
   default     = "eu-north-1"
 }
 
-variable "github_username" {
+variable "repository" {
   description = "GitHub username"
-  type        = string
-}
-
-variable "repo_name" {
-  description = "GitHub repository name"
   type        = string
 }
 
 variable "aws_account_id" {
   description = "AWS account ID"
+  type        = string
+}
+
+variable "thumbnail" {
+  description = "AWS thumbnail"
   type        = string
 }
 
