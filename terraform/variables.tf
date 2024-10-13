@@ -59,3 +59,7 @@ variable "azs" {
   type        = list(string)
   default     = ["eu-north-1a", "eu-north-1b"]
 }
+
+variable "instance_type" {
+  default = "t3.micro"
+}
