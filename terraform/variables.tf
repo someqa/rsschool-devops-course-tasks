@@ -1,7 +1,7 @@
 variable "tf_created_s3_bucket" {
   description = "Name of the S3 bucket"
   type        = string
-  default     = "tf-created-bucket-someqa" 
+  default     = "tf-created-bucket-someqa"
 }
 
 variable "aws_region" {
@@ -62,4 +62,9 @@ variable "azs" {
 
 variable "instance_type" {
   default = "t3.micro"
+}
+
+variable "k3s_token" {
+  description = "K3s token to be used for the cluster, to be defined in .tfvars file"
+  type        = string
 }
