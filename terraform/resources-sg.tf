@@ -1,34 +1,18 @@
 resource "aws_security_group" "nat_sg" {
-  name        = "nat-instance-sg"
-  description = "Allow inbound traffic for NAT instance"
-  vpc_id      = aws_vpc.k8s_vpc.id
+  vpc_id = aws_vpc.k8s_vpc.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"  # Allow all inbound traffic from private subnets
+    cidr_blocks = ["10.0.0.0/16"]  # Adjust according to your private subnet CIDR
   }
 
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "-1"  # Allow all outbound traffic to the internet
+    cidr_blocks = ["0.0.0.0/0"]  # Allow outbound to the internet
   }
 }
 
