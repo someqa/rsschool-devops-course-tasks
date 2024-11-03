@@ -28,6 +28,7 @@ iptables -t nat -A POSTROUTING -o ens5 -j MASQUERADE
 iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i ens5 -o ens5 -j ACCEPT
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables-save | tee /etc/sysconfig/iptables
 
 # Enable and start iptables service
 systemctl enable iptables
