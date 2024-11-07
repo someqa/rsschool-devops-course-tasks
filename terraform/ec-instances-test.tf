@@ -4,27 +4,27 @@ resource "aws_key_pair" "someqa-key" {
 }
 
 
-resource "aws_instance" "test_instance_public_subnet_1" {
-  ami             = "ami-097c5c21a18dc59ea"
-  instance_type   = "t3.micro"
-  subnet_id       = aws_subnet.public[0].id
-  security_groups = [aws_security_group.test_sg.id]
-  key_name        = aws_key_pair.someqa-key.key_name
-  tags = {
-    Name = "Test-Instance-Public-Subnet-1"
-  }
-}
+# resource "aws_instance" "test_instance_public_subnet_1" {
+#   ami             = "ami-097c5c21a18dc59ea"
+#   instance_type   = "t3.micro"
+#   subnet_id       = aws_subnet.public[0].id
+#   security_groups = [aws_security_group.test_sg.id]
+#   key_name        = aws_key_pair.someqa-key.key_name
+#   tags = {
+#     Name = "Test-Instance-Public-Subnet-1"
+#   }
+# }
 
-resource "aws_instance" "test_instance_public_subnet_2" {
-  ami             = "ami-097c5c21a18dc59ea"
-  instance_type   = "t3.micro"
-  subnet_id       = aws_subnet.public[1].id
-  security_groups = [aws_security_group.test_sg.id]
-  key_name        = aws_key_pair.someqa-key.key_name
-  tags = {
-    Name = "Test-Instance-Public-Subnet-2"
-  }
-}
+# resource "aws_instance" "test_instance_public_subnet_2" {
+#   ami             = "ami-097c5c21a18dc59ea"
+#   instance_type   = "t3.micro"
+#   subnet_id       = aws_subnet.public[1].id
+#   security_groups = [aws_security_group.test_sg.id]
+#   key_name        = aws_key_pair.someqa-key.key_name
+#   tags = {
+#     Name = "Test-Instance-Public-Subnet-2"
+#   }
+# }
 
 resource "aws_instance" "k3s_master" {
   depends_on      = [aws_instance.nat_instance]
@@ -45,6 +45,37 @@ resource "aws_instance" "k3s_master" {
 
     echo $TOKEN > /var/lib/rancher/k3s/server/token
     echo $MASTER_IP > /var/lib/rancher/k3s/server/ip
+
+    mkdir -p /data/jenkins-volume
+    chown -R 1000:1000 **/data/jenkins-volume
+   
+    kubectl create namespace jenkins-namespace
+
+    cat <<EOM | kubectl apply -f -
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: jenkins-pv
+    spec:
+      capacity:
+        storage: 8Gi
+      accessModes:
+        - ReadWriteOnce
+      hostPath:
+        path: /data/jenkins-volume 
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: jenkins-pvc
+      namespace: jenkins-namespace
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+    EOM
   EOF
 }
 
