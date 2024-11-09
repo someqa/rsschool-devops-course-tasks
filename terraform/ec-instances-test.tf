@@ -29,7 +29,7 @@ resource "aws_key_pair" "someqa-key" {
 resource "aws_instance" "k3s_master" {
   depends_on      = [aws_instance.nat_instance]
   ami             = "ami-097c5c21a18dc59ea"
-  instance_type   = "t3.micro"
+  instance_type   = "t3.small"
   subnet_id       = aws_subnet.private[0].id
   security_groups = [aws_security_group.k3s_sg.id]
   key_name        = aws_key_pair.someqa-key.key_name
@@ -46,43 +46,17 @@ resource "aws_instance" "k3s_master" {
     echo $TOKEN > /var/lib/rancher/k3s/server/token
     echo $MASTER_IP > /var/lib/rancher/k3s/server/ip
 
-    mkdir -p /data/jenkins-volume
-    chown -R 1000:1000 **/data/jenkins-volume
-   
+    
     kubectl create namespace jenkins-namespace
-
-    cat <<EOM | kubectl apply -f -
-    apiVersion: v1
-    kind: PersistentVolume
-    metadata:
-      name: jenkins-pv
-    spec:
-      capacity:
-        storage: 8Gi
-      accessModes:
-        - ReadWriteOnce
-      hostPath:
-        path: /data/jenkins-volume 
-    ---
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: jenkins-pvc
-      namespace: jenkins-namespace
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 8Gi
-    EOM
+    kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.6.0/deploy/longhorn.yaml 
+    
   EOF
 }
 
 resource "aws_instance" "k3s_worker" {
   depends_on      = [aws_instance.k3s_master]
   ami             = "ami-097c5c21a18dc59ea"
-  instance_type   = "t3.micro"
+  instance_type   = "t3.small"
   subnet_id       = aws_subnet.private[1].id
   security_groups = [aws_security_group.k3s_sg.id]
   key_name        = aws_key_pair.someqa-key.key_name
