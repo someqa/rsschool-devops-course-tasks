@@ -75,3 +75,20 @@ the GitHub Actions workflow will handle the deployment when you push changes to 
 # Cleanup
 To remove resources, run:
 `terraform destroy`
+
+# Helm Usage
+
+To deploy Jenkins you need to install helm
+
+## Installing Helm
+
+Please, follow the instructions here - https://helm.sh/docs/intro/install/
+
+## Verify the Installation
+
+Helm installation can be verified with the following command:
+
+```bash
+helm repo list
+helm status my-nginx
+```
